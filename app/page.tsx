@@ -1,31 +1,29 @@
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
 
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
 export default async function posts() {
-  const supabase = createServerComponentClient({ cookies })
+  const supabase = createServerComponentClient({ cookies });
 
-  const { 
-    data: post, error
-  }= await supabase.from("post").select(`
+  const { data: post, error } = await supabase.from("post").select(`
     post_text ( text, hBlockId ( content ) ),
     post_img ( img )
-  `)
-  
+  `);
+
   return (
-    <section className='flex gap-10 justify-center items-center'>
-      { post?.map(post => {
+    <section className="flex items-center justify-center gap-10">
+      {post?.map((post) => {
         return (
-          <div className='bg-slate-50 w-80'>
-            <img src={post.post_img[0].img} className='mb-5'/>
+          <div className="w-80 bg-slate-50">
+            <img src={post.post_img[0].img} className="mb-5" />
             <p>
               {`${post.post_text[0].text} `}
               {post.post_text[0].hBlockId.content}
             </p>
           </div>
-        )
+        );
       })}
     </section>
-  )
+  );
 }
