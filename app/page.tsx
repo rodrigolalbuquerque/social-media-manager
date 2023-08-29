@@ -12,7 +12,7 @@ export default async function posts() {
   `);
 
   return (
-    <section className="flex items-center justify-center gap-10">
+    <section className="flex h-screen items-center justify-center gap-10">
       {post?.map((post) => {
         return (
           <div className="w-80 bg-slate-50">
