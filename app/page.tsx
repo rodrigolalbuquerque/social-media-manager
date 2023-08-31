@@ -1,25 +1,35 @@
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
-
-export const dynamic = "force-dynamic";
+import Image from "next/image";
+import { Database } from "@/types/supabase";
+import noImg from "@/assets/imgs/noImg.jpg";
 
 export default async function posts() {
-  const supabase = createServerComponentClient({ cookies });
+  const supabase = createServerComponentClient<Database>({ cookies });
 
   const { data: post, error } = await supabase.from("post").select(`
-    post_text ( text, hBlockId ( content ) ),
+    id,
+    post_text ( text, hashtags_Block ( content ) ),
     post_img ( img )
   `);
+
+  post?.map((postItem) => console.log(postItem.post_text[0]));
 
   return (
     <section className="flex h-screen items-center justify-center gap-10">
       {post?.map((post) => {
         return (
-          <div className="w-80 bg-slate-50">
-            <img src={post.post_img[0].img} className="mb-5" />
-            <p>
-              {`${post.post_text[0].text} `}
-              {post.post_text[0].hBlockId.content}
+          <div key={post.id} className="w-80 bg-slate-50">
+            <Image
+              width={400}
+              height={600}
+              className="mb-5"
+              alt=""
+              src={post.post_img[0].img ?? noImg}
+            ></Image>
+            <p>{`${post.post_text[0].text} `}</p>
+            <p className="text-sky-600">
+              {post.post_text[0]?.hashtags_Block?.content ?? ""}
             </p>
           </div>
         );
