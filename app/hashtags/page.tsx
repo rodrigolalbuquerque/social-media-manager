@@ -1,9 +1,27 @@
 "use client";
 import FormModal from "@/components/FormModal";
-import { useState } from "react";
+import { supabase } from "@/utils/supabaseClient";
+import { useState, useEffect } from "react";
+
+type BlocksProtocol = {
+  content: string | null;
+  hBlockName: string;
+  id: number;
+};
 
 function Page() {
   const [modal, setModal] = useState(false);
+  const [blocks, setBlocks] = useState<BlocksProtocol[] | null>(null);
+
+  useEffect(() => {
+    const getBlocks = async () => {
+      const { data, error } = await supabase.from("hashtags_Block").select("*");
+      setBlocks((prevBlock) => prevBlock ?? data);
+      return data;
+    };
+
+    getBlocks();
+  }, []);
 
   const toggleModal = () => {
     setModal((prevModal) => (prevModal ? false : true));
@@ -21,15 +39,15 @@ function Page() {
         </button>
       </div>
       <div className="flex justify-center gap-10">
-        <div className="min-h-72 w-72 max-w-lg rounded-md border border-black bg-slate-50 drop-shadow-md lg:h-96">
-          <h2 className="mb-7 p-5 text-3xl">Casamento</h2>
-          <p className="p-5 text-lg">
-            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ipsam nam
-            hic corrupti qui temporibus cumque nostrum quidem, placeat
-            laudantium ducimus voluptatum magni quo deserunt repellendus porro
-            ipsa vel nisi vero?
-          </p>
-        </div>
+        {blocks?.map((block) => (
+          <div
+            key={block.id}
+            className="min-h-72 w-72 max-w-lg rounded-md border border-black bg-slate-50 drop-shadow-md lg:h-96"
+          >
+            <h2 className="mb-7 p-5 text-3xl">{block.hBlockName}</h2>
+            <p className="p-5 text-lg">{block.content}</p>
+          </div>
+        ))}
       </div>
     </div>
   );

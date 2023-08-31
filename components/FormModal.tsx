@@ -2,7 +2,7 @@ import { useState } from "react";
 
 export default function FormModal() {
   const [block, setData] = useState({
-    name: "",
+    hBlockName: "",
     content: "",
   });
 
@@ -22,7 +22,7 @@ export default function FormModal() {
 
     const data = await res.json();
 
-    console.log(data);
+    console.log(typeof data);
   };
 
   return (
@@ -34,11 +34,11 @@ export default function FormModal() {
           </label>
           <input
             onChange={handle} //same as (e)=>handle(e)
-            value={block.name}
+            value={block.hBlockName}
             placeholder="Nome do Bloco"
             required
             type="text"
-            id="name"
+            id="hBlockName"
             className="name w-60 rounded-md border border-black bg-slate-50 p-2 text-lg drop-shadow-md"
           />
         </div>

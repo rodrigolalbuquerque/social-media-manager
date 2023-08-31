@@ -13,8 +13,6 @@ export default async function posts() {
     post_img ( img )
   `);
 
-  post?.map((postItem) => console.log(postItem.post_text[0]));
-
   return (
     <section className="flex h-screen items-center justify-center gap-10">
       {post?.map((post) => {
