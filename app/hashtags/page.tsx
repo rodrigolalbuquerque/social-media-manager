@@ -9,7 +9,7 @@ type BlocksProtocol = {
   id: number;
 };
 
-function Page() {
+const Page = () => {
   const [modal, setModal] = useState(false);
   const [blocks, setBlocks] = useState<BlocksProtocol[] | null>(null);
 
@@ -24,12 +24,12 @@ function Page() {
   }, []);
 
   const toggleModal = () => {
-    setModal((prevModal) => (prevModal ? false : true));
+    setModal((prevModal) => !prevModal);
   };
 
   return (
     <div className="relative h-screen">
-      {modal && <FormModal />}
+      {modal && <FormModal toggleModal={toggleModal} />}
       <div className="flex justify-end">
         <button
           onClick={toggleModal}
@@ -51,6 +51,6 @@ function Page() {
       </div>
     </div>
   );
-}
+};
 
 export default Page;
