@@ -5,14 +5,14 @@ import { supabase } from "@/utils/supabaseClient";
 
 interface UpdaterFormProtocol {
   updateBlockFunc: () => void;
-  updateUpdaterModalState: () => void;
-  blockCurrentValues: BlockProtocol;
+  toogleEditModal: () => void;
+  currentBlockValues: BlockProtocol;
 }
 
 const UpdaterFormModal: React.FC<UpdaterFormProtocol> = ({
   updateBlockFunc,
-  updateUpdaterModalState,
-  blockCurrentValues,
+  toogleEditModal,
+  currentBlockValues,
 }) => {
   const [block, setBlock] = useState({
     hBlockName: "",
@@ -21,8 +21,8 @@ const UpdaterFormModal: React.FC<UpdaterFormProtocol> = ({
 
   useEffect(() => {
     setBlock({
-      hBlockName: blockCurrentValues.hBlockName,
-      content: blockCurrentValues.content || "",
+      hBlockName: currentBlockValues.hBlockName,
+      content: currentBlockValues.content || "",
     });
   }, []);
 
@@ -39,10 +39,10 @@ const UpdaterFormModal: React.FC<UpdaterFormProtocol> = ({
         hBlockName: `${block.hBlockName}`,
         content: `${block.content}`,
       })
-      .eq("id", blockCurrentValues.id);
+      .eq("id", currentBlockValues.id);
 
     updateBlockFunc();
-    updateUpdaterModalState();
+    toogleEditModal();
   };
 
   return (
@@ -50,7 +50,7 @@ const UpdaterFormModal: React.FC<UpdaterFormProtocol> = ({
       <div className="absolute z-10 h-screen w-screen bg-black opacity-60"></div>
       <div className="fixed left-0 right-0 top-40 z-10 mx-auto flex w-80 flex-col items-center justify-center rounded-md border border-black bg-slate-50 drop-shadow-md">
         <button
-          onClick={updateUpdaterModalState}
+          onClick={toogleEditModal}
           className="absolute right-2 top-2 text-xl"
         >
           &#128473;

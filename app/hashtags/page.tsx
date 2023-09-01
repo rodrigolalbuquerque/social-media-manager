@@ -1,4 +1,5 @@
 "use client";
+import DeletionFormModal from "@/components/DeletionFormModal";
 import FormModal from "@/components/FormModal";
 import UpdaterFormModal from "@/components/UpdaterFormModal";
 import { supabase } from "@/utils/supabaseClient";
@@ -11,29 +12,18 @@ export interface BlockProtocol {
 }
 
 type BlocksProtocol = BlockProtocol[] | null;
-type UpdaterModalProtocol = [boolean, BlockProtocol];
 
 const Page = () => {
   const [modal, setModal] = useState(false);
   const [updaterModal, setUpdaterModal] = useState(false);
-  const [blockCurrentValues, setBlockCurrentValues] = useState<BlockProtocol>({
+  const [deletionModal, setDeletionModal] = useState(false);
+  const [currentBlockValues, setcurrentBlockValues] = useState<BlockProtocol>({
     content: "",
     hBlockName: "",
     id: 0,
   });
   const [blocks, setBlocks] = useState<BlocksProtocol>(null);
   const [updateBlock, setUpdateBlock] = useState<boolean>(false);
-
-  const deleteBlock = async (value: number) => {
-    const { error } = await supabase
-      .from("hashtags_Block")
-      .delete()
-      .eq("id", `${value}`);
-
-    if (error) console.log(error);
-
-    updateBlockFunc();
-  };
 
   useEffect(() => {
     const getBlocks = async () => {
@@ -56,25 +46,37 @@ const Page = () => {
   };
 
   const closeModal = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === "Escape" && modal) toggleModal();
-    if (e.key === "Escape" && updaterModal) updateUpdaterModalState();
+    if (e.key === "Escape") {
+      if (modal) toggleModal();
+      if (updaterModal) toogleEditModal();
+      if (deletionModal) toggleDeletionModal();
+    }
   };
 
   const updateBlockFunc = () => {
     setUpdateBlock((prevState) => !prevState);
   };
 
-  const toggleUpdaterModal = (block: BlockProtocol) => {
-    updateUpdaterModalState();
-    updateBlockCurrentValues(block);
+  const handleEdit = (block: BlockProtocol) => {
+    toogleEditModal();
+    updateCurrentBlockValues(block);
   };
 
-  const updateUpdaterModalState = () => {
+  const toogleEditModal = () => {
     setUpdaterModal((prevState) => !prevState);
   };
 
-  const updateBlockCurrentValues = (block: BlockProtocol) => {
-    setBlockCurrentValues(block);
+  const updateCurrentBlockValues = (block: BlockProtocol) => {
+    setcurrentBlockValues(block);
+  };
+
+  const toggleDeletionModal = () => {
+    setDeletionModal((PrevState) => !PrevState);
+  };
+
+  const handleDelete = (block: BlockProtocol) => {
+    toggleDeletionModal();
+    updateCurrentBlockValues(block);
   };
 
   return (
@@ -88,8 +90,15 @@ const Page = () => {
       {updaterModal && (
         <UpdaterFormModal
           updateBlockFunc={updateBlockFunc}
-          updateUpdaterModalState={updateUpdaterModalState}
-          blockCurrentValues={blockCurrentValues}
+          toogleEditModal={toogleEditModal}
+          currentBlockValues={currentBlockValues}
+        />
+      )}
+      {deletionModal && (
+        <DeletionFormModal
+          updateBlockFunc={updateBlockFunc}
+          toggleDeletionModal={toggleDeletionModal}
+          currentBlockValues={currentBlockValues}
         />
       )}
       <div className="flex justify-end">
@@ -107,7 +116,7 @@ const Page = () => {
             className="min-h-72 relative w-72 max-w-lg rounded-md border border-black bg-slate-50 drop-shadow-md lg:h-96"
           >
             <button
-              onClick={() => deleteBlock(block.id)}
+              onClick={() => handleDelete(block)}
               className="absolute right-2 top-2 text-xl"
             >
               &#128473;
@@ -115,7 +124,7 @@ const Page = () => {
             <div className="flex items-center">
               <h2 className="mb-7 p-5 text-3xl">{block.hBlockName}</h2>
               <button
-                onClick={() => toggleUpdaterModal(block)}
+                onClick={() => handleEdit(block)}
                 className="mb-5 h-8 rounded-md border border-black bg-slate-50 p-2 text-center leading-3 drop-shadow-md"
               >
                 Editar
