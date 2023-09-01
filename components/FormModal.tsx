@@ -1,38 +1,40 @@
+"use client";
 import { useState } from "react";
 
 interface ModalProp {
   toggleModal: () => void;
 }
 
-const FormModal: React.FC<ModalProp> = ({ toggleModal }) => {
+interface UpdateBlockProp {
+  updateBlockFunc: () => void;
+}
+
+interface CombinedProps extends ModalProp, UpdateBlockProp {}
+
+const FormModal: React.FC<CombinedProps> = ({
+  updateBlockFunc,
+  toggleModal,
+}) => {
   const [block, setData] = useState({
     hBlockName: "",
     content: "",
   });
 
-  const [isModalOpen, setIsModalOpen] = useState(true);
-
-  const closeModal = () => {
-    setIsModalOpen((prevState) => !prevState);
-  };
-
   const updateFormValue = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     setData((prevState) => ({ ...prevState, [e.target.id]: e.target.value }));
-    console.log(block);
   };
 
   const postForm = async () => {
-    const res = await fetch("/api/hashtags", {
+    await fetch("/api/hashtags", {
       method: "POST",
       body: JSON.stringify(block),
       headers: { "Content-Type": "application/json" },
     });
 
-    const data = await res.json();
-
-    console.log(typeof data);
+    updateBlockFunc();
+    toggleModal();
   };
 
   return (

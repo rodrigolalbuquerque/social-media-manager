@@ -13,6 +13,5 @@ export async function POST(req: NextRequest) {
     .insert([body])
     .select();
 
-  console.log(data);
   return NextResponse.json({ message: "Data received!" });
 }
