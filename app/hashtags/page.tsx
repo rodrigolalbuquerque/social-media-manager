@@ -1,18 +1,26 @@
 "use client";
 import FormModal from "@/components/FormModal";
+import UpdaterFormModal from "@/components/UpdaterFormModal";
 import { supabase } from "@/utils/supabaseClient";
 import { useState, useEffect } from "react";
 
-type BlockProtocol = {
+export interface BlockProtocol {
   content: string | null;
   hBlockName: string;
   id: number;
-};
+}
 
 type BlocksProtocol = BlockProtocol[] | null;
+type UpdaterModalProtocol = [boolean, BlockProtocol];
 
 const Page = () => {
   const [modal, setModal] = useState(false);
+  const [updaterModal, setUpdaterModal] = useState(false);
+  const [blockCurrentValues, setBlockCurrentValues] = useState<BlockProtocol>({
+    content: "",
+    hBlockName: "",
+    id: 0,
+  });
   const [blocks, setBlocks] = useState<BlocksProtocol>(null);
   const [updateBlock, setUpdateBlock] = useState<boolean>(false);
 
@@ -21,6 +29,8 @@ const Page = () => {
       .from("hashtags_Block")
       .delete()
       .eq("id", `${value}`);
+
+    if (error) console.log(error);
 
     updateBlockFunc();
   };
@@ -46,11 +56,25 @@ const Page = () => {
   };
 
   const closeModal = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === "Escape") toggleModal();
+    if (e.key === "Escape" && modal) toggleModal();
+    if (e.key === "Escape" && updaterModal) updateUpdaterModalState();
   };
 
   const updateBlockFunc = () => {
     setUpdateBlock((prevState) => !prevState);
+  };
+
+  const toggleUpdaterModal = (block: BlockProtocol) => {
+    updateUpdaterModalState();
+    updateBlockCurrentValues(block);
+  };
+
+  const updateUpdaterModalState = () => {
+    setUpdaterModal((prevState) => !prevState);
+  };
+
+  const updateBlockCurrentValues = (block: BlockProtocol) => {
+    setBlockCurrentValues(block);
   };
 
   return (
@@ -59,6 +83,13 @@ const Page = () => {
         <FormModal
           updateBlockFunc={updateBlockFunc}
           toggleModal={toggleModal}
+        />
+      )}
+      {updaterModal && (
+        <UpdaterFormModal
+          updateBlockFunc={updateBlockFunc}
+          updateUpdaterModalState={updateUpdaterModalState}
+          blockCurrentValues={blockCurrentValues}
         />
       )}
       <div className="flex justify-end">
@@ -81,7 +112,15 @@ const Page = () => {
             >
               &#128473;
             </button>
-            <h2 className="mb-7 p-5 text-3xl">{block.hBlockName}</h2>
+            <div className="flex items-center">
+              <h2 className="mb-7 p-5 text-3xl">{block.hBlockName}</h2>
+              <button
+                onClick={() => toggleUpdaterModal(block)}
+                className="mb-5 h-8 rounded-md border border-black bg-slate-50 p-2 text-center leading-3 drop-shadow-md"
+              >
+                Editar
+              </button>
+            </div>
             <p className="p-5 text-lg">{block.content}</p>
           </div>
         ))}

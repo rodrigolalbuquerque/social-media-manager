@@ -1,40 +1,48 @@
 "use client";
-import { useState } from "react";
+import { BlockProtocol } from "@/app/hashtags/page";
+import { useState, useEffect } from "react";
+import { supabase } from "@/utils/supabaseClient";
 
-interface ModalProp {
-  toggleModal: () => void;
-}
-
-interface UpdateBlockProp {
+interface UpdaterFormProtocol {
   updateBlockFunc: () => void;
+  updateUpdaterModalState: () => void;
+  blockCurrentValues: BlockProtocol;
 }
 
-interface CombinedProps extends ModalProp, UpdateBlockProp {}
-
-const FormModal: React.FC<CombinedProps> = ({
+const UpdaterFormModal: React.FC<UpdaterFormProtocol> = ({
   updateBlockFunc,
-  toggleModal,
+  updateUpdaterModalState,
+  blockCurrentValues,
 }) => {
-  const [block, setData] = useState({
+  const [block, setBlock] = useState({
     hBlockName: "",
     content: "",
   });
 
+  useEffect(() => {
+    setBlock({
+      hBlockName: blockCurrentValues.hBlockName,
+      content: blockCurrentValues.content || "",
+    });
+  }, []);
+
   const updateFormValue = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
-    setData((prevState) => ({ ...prevState, [e.target.id]: e.target.value }));
+    setBlock((prevState) => ({ ...prevState, [e.target.id]: e.target.value }));
   };
 
-  const postForm = async () => {
-    await fetch("/api/hashtags", {
-      method: "POST",
-      body: JSON.stringify(block),
-      headers: { "Content-Type": "application/json" },
-    });
+  const updateBlock = async () => {
+    const { error } = await supabase
+      .from("hashtags_Block")
+      .update({
+        hBlockName: `${block.hBlockName}`,
+        content: `${block.content}`,
+      })
+      .eq("id", blockCurrentValues.id);
 
     updateBlockFunc();
-    toggleModal();
+    updateUpdaterModalState();
   };
 
   return (
@@ -42,7 +50,7 @@ const FormModal: React.FC<CombinedProps> = ({
       <div className="absolute z-10 h-screen w-screen bg-black opacity-60"></div>
       <div className="fixed left-0 right-0 top-40 z-10 mx-auto flex w-80 flex-col items-center justify-center rounded-md border border-black bg-slate-50 drop-shadow-md">
         <button
-          onClick={toggleModal}
+          onClick={updateUpdaterModalState}
           className="absolute right-2 top-2 text-xl"
         >
           &#128473;
@@ -72,10 +80,10 @@ const FormModal: React.FC<CombinedProps> = ({
             />
           </div>
           <button
-            onClick={postForm}
+            onClick={updateBlock}
             className="flex w-20 items-center justify-center rounded-md border border-black bg-slate-50 px-5 py-2 drop-shadow-md"
           >
-            Criar
+            Atualizar
           </button>
         </div>
       </div>
@@ -83,4 +91,4 @@ const FormModal: React.FC<CombinedProps> = ({
   );
 };
 
-export default FormModal;
+export default UpdaterFormModal;
