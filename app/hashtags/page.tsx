@@ -1,8 +1,8 @@
 "use client";
-import DeletionFormModal from "@/components/DeletionFormModal";
-import FormModal from "@/components/FormModal";
-import UpdaterFormModal from "@/components/UpdaterFormModal";
-import { supabase } from "@/utils/supabaseClient";
+import DeletionFormModal from "@/components/(hashtag)/DeletionFormModal";
+import FormModal from "@/components/(hashtag)/FormModal";
+import UpdaterFormModal from "@/components/(hashtag)/UpdaterFormModal";
+import supabase from "@/utils/supabaseClient";
 import { useState, useEffect } from "react";
 
 export interface BlockProtocol {
@@ -17,13 +17,13 @@ const Page = () => {
   const [modal, setModal] = useState(false);
   const [updaterModal, setUpdaterModal] = useState(false);
   const [deletionModal, setDeletionModal] = useState(false);
+  const [blocks, setBlocks] = useState<BlocksProtocol>(null);
+  const [updateBlock, setUpdateBlock] = useState<boolean>(false);
   const [currentBlockValues, setcurrentBlockValues] = useState<BlockProtocol>({
     content: "",
     hBlockName: "",
     id: 0,
   });
-  const [blocks, setBlocks] = useState<BlocksProtocol>(null);
-  const [updateBlock, setUpdateBlock] = useState<boolean>(false);
 
   useEffect(() => {
     const getBlocks = async () => {
@@ -32,6 +32,7 @@ const Page = () => {
           .from("hashtags_Block")
           .select("*");
         setBlocks(data);
+        if (error) console.log(error);
       } catch (error) {
         console.log(error);
       }

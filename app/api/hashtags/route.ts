@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/utils/supabaseClient";
+import { supabase } from "@/utils/example-from-docs";
 
 export async function GET() {
   return NextResponse.json({ message: "Aloha!" });

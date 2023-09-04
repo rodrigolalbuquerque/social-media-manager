@@ -1,7 +1,7 @@
 "use client";
 import { BlockProtocol } from "@/app/hashtags/page";
 import { useState, useEffect } from "react";
-import { supabase } from "@/utils/supabaseClient";
+import { supabase } from "@/utils/example-from-docs";
 
 interface UpdaterFormProtocol {
   updateBlockFunc: () => void;
@@ -14,18 +14,6 @@ const DeletionFormModal: React.FC<UpdaterFormProtocol> = ({
   toggleDeletionModal,
   currentBlockValues,
 }) => {
-  const [block, setBlock] = useState({
-    hBlockName: "",
-    content: "",
-  });
-
-  useEffect(() => {
-    setBlock({
-      hBlockName: currentBlockValues.hBlockName,
-      content: currentBlockValues.content || "",
-    });
-  }, []);
-
   const deleteBlock = async () => {
     const { error } = await supabase
       .from("hashtags_Block")

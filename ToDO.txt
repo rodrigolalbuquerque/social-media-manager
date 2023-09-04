@@ -1,0 +1,4 @@
+- fazer alteração nas funções de atualizar dados, modificando estados e re-renderizando
+no lugar de apenas modificar base de dados e fazer nova requisição
+
+- Deixar apenas uma instância do supabase (substituir nas paginas)
