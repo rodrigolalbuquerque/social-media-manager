@@ -47,8 +47,8 @@ const FormModal: React.FC<ModalProtocol> = ({
     if (!imgPath) return;
     const postId = await InsertOnPost();
     await InsertOnPostImg(postId, imgPath);
-    updatePostsFunc();
     toggleModal();
+    updatePostsFunc();
   };
 
   return (
@@ -79,7 +79,7 @@ const FormModal: React.FC<ModalProtocol> = ({
                 className="rounded-md border border-black bg-slate-50 px-5 py-2 drop-shadow-md"
                 type="submit"
               >
-                Enviar
+                Criar
               </button>
             </form>
           </div>

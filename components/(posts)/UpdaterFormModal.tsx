@@ -3,11 +3,11 @@ import { BlockProtocol } from "@/app/hashtags/page";
 import { useState, useEffect } from "react";
 import { supabase } from "@/utils/example-from-docs";
 
-interface UpdaterProtocol {
-  toggleEditModal: () => void;
-  updatePostsFunc: () => void;
-  currentPostValues: BlockProtocol;
-}
+// interface UpdaterProtocol {
+//   toggleEditModal: () => void;
+//   updatePostsFunc: () => void;
+//   currentPostValues: BlockProtocol;
+// }
 
 const UpdaterFormModal: React.FC<UpdaterProtocol> = ({
   toggleEditModal,

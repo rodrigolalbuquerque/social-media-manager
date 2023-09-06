@@ -13,16 +13,31 @@ const DeletionFormModal: React.FC<DeleteProtocol> = ({
   updatePostsFunc,
   currentPostValues,
 }) => {
-  const deletePost = async () => {
+  const deleteRowFromPost = async () => {
     const { error } = await supabase
       .from("post")
       .delete()
       .eq("id", `${currentPostValues.id}`);
 
     if (error) console.log(error);
+  };
 
-    updatePostsFunc();
+  const deleteFileFromStorage = async () => {
+    const seccionedUrl = currentPostValues.post_img[0].img?.split("/");
+    if (!seccionedUrl) throw new Error("url da imagem não encontrada");
+    const fileName = seccionedUrl[seccionedUrl.length - 1];
+    const { error } = await supabase.storage
+      .from("post-file")
+      .remove([fileName]);
+    console.log(fileName);
+    if (error) console.log(error);
+  };
+
+  const deletePost = async () => {
+    await deleteRowFromPost();
+    await deleteFileFromStorage();
     toggleDeleteModal();
+    updatePostsFunc();
   };
 
   return (

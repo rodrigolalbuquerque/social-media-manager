@@ -46,6 +46,7 @@ export default function Page() {
       } catch (error) {
         console.log(error);
       }
+      console.log("useEffect rodou!");
     };
 
     getPosts();
@@ -69,6 +70,7 @@ export default function Page() {
 
   const updatePostsFunc = () => {
     setUpdatePosts((prevState) => !prevState);
+    console.log("updatePostsFunc rodou!");
   };
 
   const updateCurrentPostValues = (post: PostProtocol) => {
