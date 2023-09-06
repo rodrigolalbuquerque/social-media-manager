@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import noImg from "@/assets/imgs/noImg.jpg";
 import supabase from "@/utils/supabaseClient";
 import { useEffect, useState } from "react";
@@ -135,18 +136,21 @@ export default function Page() {
             >
               <button
                 onClick={() => handleOptions(post)}
-                className="absolute right-1 top-1 z-10 text-center text-2xl text-white "
+                className="absolute right-1 top-1 z-10 text-center text-2xl text-white"
               >
                 &#10247;
               </button>
               <div className="h-96 w-full">
-                <img
-                  src={post.post_img[0].img ?? noImg}
+                <Image
                   className="h-full w-full object-cover"
+                  alt=""
+                  src={post.post_img[0]?.img ?? noImg}
+                  width={noImg.width}
+                  height={noImg.height}
                 />
               </div>
               <div className="h-52 w-full">
-                <p>{`${post.post_text[0].text} `}</p>
+                <p>{`${post.post_text[0]?.text} `}</p>
                 <p className="text-sky-600">
                   {post.post_text[0]?.hashtags_Block?.content ?? ""}
                 </p>

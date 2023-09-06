@@ -1,6 +1,5 @@
 "use client";
 import { PostProtocol } from "@/app/page";
-import { useState, useEffect } from "react";
 import { supabase } from "@/utils/example-from-docs";
 
 interface DeleteProtocol {
@@ -14,9 +13,9 @@ const DeletionFormModal: React.FC<DeleteProtocol> = ({
   updatePostsFunc,
   currentPostValues,
 }) => {
-  const deleteBlock = async () => {
+  const deletePost = async () => {
     const { error } = await supabase
-      .from("hashtags_Block")
+      .from("post")
       .delete()
       .eq("id", `${currentPostValues.id}`);
 
@@ -40,7 +39,7 @@ const DeletionFormModal: React.FC<DeleteProtocol> = ({
           <p className="p-4 text-xl font-bold">Deletar Post?</p>
           <div className="flex items-center justify-center gap-5">
             <button
-              onClick={deleteBlock}
+              onClick={deletePost}
               className="flex w-20 items-center justify-center rounded-md border border-black bg-slate-50 px-5 py-2 drop-shadow-md"
             >
               Sim

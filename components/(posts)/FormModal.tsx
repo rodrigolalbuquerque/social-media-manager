@@ -13,51 +13,40 @@ const FormModal: React.FC<ModalProtocol> = ({
 }) => {
   const [file, setFile] = useState<File>();
 
-  const [block, setData] = useState({
-    hBlockName: "",
-    content: "",
-  });
-
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const acceptedTypes = ["image/jpeg", "image/png", "video/mp4"];
-
+  const storeFile = async () => {
     if (!file) return;
-    if (!acceptedTypes.includes(file.type)) {
-      console.log("Arquivos permitidios: JPEG, JPG, PNG e MP4");
-      return;
-    }
+    const { data, error } = await supabase.storage
+      .from("post-file")
+      .upload(`${file.name}-${Date.now()}`, file);
+    if (error) console.log(error);
+    if (data) return data.path;
+  };
 
-    try {
-      const mediaData = new FormData();
-      mediaData.set("file", file);
-
-      const avatarFile = file;
-      const { error } = await supabase.storage
-        .from("avatars")
-        .upload("/", avatarFile, {
-          cacheControl: "600",
-          upsert: false,
-        });
-      if (error) console.log(error);
-    } catch (e: any) {
-      console.error(e);
+  const InsertOnPost = async () => {
+    const { data, error } = await supabase.from("post").insert([{}]).select();
+    if (error) console.log(error);
+    if (data) {
+      return data[0].id;
+    } else {
+      return 0;
     }
   };
 
-  const updateFormValue = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    setData((prevState) => ({ ...prevState, [e.target.id]: e.target.value }));
+  const InsertOnPostImg = async (postId: number, imgPath: string) => {
+    await supabase.from("post_img").insert([
+      {
+        postId: postId,
+        img: `https://gipxfbdqcjrzcpmcfxoq.supabase.co/storage/v1/object/public/post-file/${imgPath}`,
+      },
+    ]);
   };
 
-  const postForm = async () => {
-    await fetch("/api/hashtags", {
-      method: "POST",
-      body: JSON.stringify(block),
-      headers: { "Content-Type": "application/json" },
-    });
-
+  const createPost = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const imgPath = await storeFile();
+    if (!imgPath) return;
+    const postId = await InsertOnPost();
+    await InsertOnPostImg(postId, imgPath);
     updatePostsFunc();
     toggleModal();
   };
@@ -72,37 +61,28 @@ const FormModal: React.FC<ModalProtocol> = ({
         >
           &#128473;
         </button>
-        <div className="my-5 flex w-9/12 flex-col items-center justify-center gap-12">
+        <div className="my-5 flex w-9/12 flex-col items-center justify-center gap-5">
           <div className="flex flex-col items-center justify-center">
             <span className="mb-2 text-xl">Imagem / Vídeo</span>
-            <form onSubmit={onSubmit}>
+            <form
+              onSubmit={createPost}
+              className="flex flex-col items-center justify-center gap-6"
+            >
               <input
                 accept="image/jpeg, image/png, video/mp4, .jpeg, .jpg, .png, .mp4"
-                className="w-60"
+                className="mt-5 w-60"
                 type="file"
                 name="file"
                 onChange={(e) => setFile(e.target.files?.[0])}
               />
-              <button type="submit">Enviar</button>
+              <button
+                className="rounded-md border border-black bg-slate-50 px-5 py-2 drop-shadow-md"
+                type="submit"
+              >
+                Enviar
+              </button>
             </form>
           </div>
-          <div className="hBlock flex flex-col items-center justify-center">
-            <span className="mb-2 text-xl">Hashtags</span>
-            <textarea
-              onChange={updateFormValue}
-              value={block.content}
-              placeholder="Hashtags"
-              required
-              id="content"
-              className="h-36 w-60 resize-none rounded-md border border-black bg-slate-50 p-2 text-lg drop-shadow-md"
-            />
-          </div>
-          <button
-            onClick={postForm}
-            className="flex w-20 items-center justify-center rounded-md border border-black bg-slate-50 px-5 py-2 drop-shadow-md"
-          >
-            Criar
-          </button>
         </div>
       </div>
     </div>
