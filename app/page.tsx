@@ -8,13 +8,16 @@ import DeletionFormModal from "@/components/(posts)/DeletionFormModal";
 
 const postObject = {
   id: 0,
-  post_text: [{ text: "", hashtags_Block: { hBlockName: "", content: "" } }],
+  post_text: [
+    { id: 0, text: "", hashtags_Block: { hBlockName: "", content: "" } },
+  ],
   post_img: [{ img: "", id: 0 }],
 };
 
 export interface PostProtocol {
   id: number;
   post_text: {
+    id: number;
     text: string;
     hashtags_Block: {
       hBlockName: string;
@@ -39,7 +42,7 @@ export default function Page() {
       try {
         const { data, error } = await supabase.from("post").select(`
         id,
-        post_text ( text, hashtags_Block ( hBlockName, content ) ),
+        post_text ( id, text, hashtags_Block ( hBlockName, content ) ),
         post_img ( img, id )
     `);
         if (data) setPosts(data);

@@ -28,10 +28,12 @@ const UpdaterFormModal: React.FC<UpdaterProtocol> = ({
 }) => {
   const [file, setFile] = useState<File>();
   const [postText, setpostText] = useState("");
-  const [hashtagsBlock, setHashtagsBlock] = useState<BlocksProtocol[]>([
+  const [hashtagBlocks, setHashtagBlocks] = useState<BlocksProtocol[]>([
     blockObject,
   ]);
   const [blockName, setBlockName] = useState("");
+  const [shouldSendData, setShouldSendData] = useState(false);
+  const [errors, setErrors] = useState([""]);
 
   const currentBlockName =
     currentPostValues.post_text[0]?.hashtags_Block?.hBlockName;
@@ -46,7 +48,7 @@ const UpdaterFormModal: React.FC<UpdaterProtocol> = ({
     const getBlocks = async () => {
       const res = await fetch("/api/hashtags");
       const blocks = await res.json();
-      setHashtagsBlock(blocks);
+      setHashtagBlocks(blocks);
     };
 
     getBlocks();
@@ -57,16 +59,29 @@ const UpdaterFormModal: React.FC<UpdaterProtocol> = ({
   };
 
   const updateFileFromStorage = async () => {
+    const acceptedTypes = ["image/jpeg", "image/jpg", "image/png", "video/mp4"];
     if (file) {
+      if (acceptedTypes.includes(file?.type)) {
+        setErrors((prevErrors) => [
+          ...prevErrors,
+          "Arquivos permitidos: Jpeg, png e mp4",
+        ]);
+        return;
+      }
       const fileName = currentPostValues.post_img[0].img?.match(/\/([^\/]+)\?/);
-      if (fileName) {
-        const { error } = await supabase.storage
-          .from("post-file")
-          .upload(fileName[1], file, { upsert: true });
-        if (error) {
-          console.log(error);
-          return error;
-        }
+      if (!fileName) {
+        setErrors((prevErrors) => [
+          ...prevErrors,
+          "Nome do arquivo não pode ser extraído da BD!",
+        ]);
+        return;
+      }
+      const { error } = await supabase.storage
+        .from("post-file")
+        .upload(fileName[1], file, { upsert: true });
+      if (error) {
+        setErrors((prevErrors) => [...prevErrors, error.message]);
+        return;
       }
     }
   };
@@ -75,35 +90,70 @@ const UpdaterFormModal: React.FC<UpdaterProtocol> = ({
     const fileUrl = currentPostValues.post_img[0].img;
     const updatedUrl = fileUrl?.replace(/[0-9]+$/gm, `${Date.now()}`);
 
-    if (fileUrl) {
-      const { error } = await supabase
-        .from("post_img")
-        .update({ img: updatedUrl })
-        .eq(`id`, `${currentPostValues.post_img[0].id}`);
+    if (!fileUrl) {
+      setErrors((prevErrors) => [
+        ...prevErrors,
+        "Nome do arquivo não pode ser extraído da BD!",
+      ]);
+      return;
+    }
 
-      if (error) {
-        console.log(error);
-        return error;
-      }
+    const { error } = await supabase
+      .from("post_img")
+      .update({ img: updatedUrl })
+      .eq(`id`, `${currentPostValues.post_img[0].id}`);
+
+    if (error) {
+      setErrors((prevErrors) => [...prevErrors, error.message]);
+      return;
     }
   };
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (await updateFileFromStorage()) return;
+    await updateFileFromStorage();
+    if (errors.length > 0) return;
 
-    if (await updateFileUrlQueryString()) return;
+    await updateFileUrlQueryString();
+    if (errors.length > 0) return;
+
+    setShouldSendData(true);
+
+    if (!postText || postText === currentPostValues.post_text[0]?.text) {
+    }
 
     if (postText && postText !== currentPostValues.post_text[0]?.text) {
-      console.log("Texto enviado: ", postText);
+      const { error } = await supabase
+        .from("post_text")
+        .update({ text: postText })
+        .eq(`id`, `${currentPostValues.post_text[0].id}`);
+
+      if (error) {
+        setErrors((prevErrors) => [...prevErrors, error.message]);
+        return;
+      }
     }
 
     if (blockName !== "Selecione" && blockName !== currentBlockName) {
-      console.log("Bloco enviado: ", blockName);
+      const targetBlock = hashtagBlocks.filter(
+        (block) => block.hBlockName === blockName,
+      );
+
+      const { error } = await supabase
+        .from("post_text")
+        .update({ hBlockId: targetBlock[0].id })
+        .eq(`id`, `${currentPostValues.post_text[0].id}`);
+      if (error) {
+        console.log(error);
+        return;
+      }
     }
 
-    updatePostsFunc();
-    toggleEditModal();
+    if (shouldSendData) {
+      updatePostsFunc();
+      toggleEditModal();
+      setShouldSendData(false);
+    }
   };
 
   // const updateBlock = async () => {
@@ -160,7 +210,7 @@ const UpdaterFormModal: React.FC<UpdaterProtocol> = ({
                 setBlockName(e.target.value);
               }}
             >
-              {hashtagsBlock.map((block) => (
+              {hashtagBlocks.map((block) => (
                 <option value={block.hBlockName} key={block.id}>
                   {block.hBlockName}
                 </option>
