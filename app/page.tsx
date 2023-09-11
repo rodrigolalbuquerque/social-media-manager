@@ -1,6 +1,4 @@
 "use client";
-import Image from "next/image";
-import noImg from "@/assets/imgs/noImg.jpg";
 import supabase from "@/utils/supabaseClient";
 import { useEffect, useState } from "react";
 import FormModal from "@/components/(posts)/FormModal";
@@ -10,17 +8,20 @@ import DeletionFormModal from "@/components/(posts)/DeletionFormModal";
 
 const postObject = {
   id: 0,
-  post_text: [{ text: "", hashtags_Block: { content: "" } }],
-  post_img: [{ img: "" }],
+  post_text: [{ text: "", hashtags_Block: { hBlockName: "", content: "" } }],
+  post_img: [{ img: "", id: 0 }],
 };
 
 export interface PostProtocol {
   id: number;
   post_text: {
     text: string;
-    hashtags_Block: { content: string | null } | null;
+    hashtags_Block: {
+      hBlockName: string;
+      content: string;
+    } | null;
   }[];
-  post_img: { img: string | null }[];
+  post_img: { img: string | null; id: number }[];
 }
 
 export default function Page() {
@@ -38,15 +39,14 @@ export default function Page() {
       try {
         const { data, error } = await supabase.from("post").select(`
         id,
-        post_text ( text, hashtags_Block ( content ) ),
-        post_img ( img )
+        post_text ( text, hashtags_Block ( hBlockName, content ) ),
+        post_img ( img, id )
     `);
         if (data) setPosts(data);
         if (error) console.log(error);
       } catch (error) {
         console.log(error);
       }
-      console.log("useEffect rodou!");
     };
 
     getPosts();
@@ -138,17 +138,15 @@ export default function Page() {
             >
               <button
                 onClick={() => handleOptions(post)}
-                className="absolute right-1 top-1 z-10 text-center text-2xl text-white"
+                className="absolute right-1 top-1 z-10 bg-slate-700 text-center text-2xl text-white"
               >
                 &#10247;
               </button>
               <div className="h-96 w-full">
-                <Image
+                <img
                   className="h-full w-full object-cover"
                   alt=""
-                  src={post.post_img[0]?.img ?? noImg}
-                  width={noImg.width}
-                  height={noImg.height}
+                  src={post.post_img[0]?.img ?? "/noImg.jpg"}
                 />
               </div>
               <div className="h-52 w-full">

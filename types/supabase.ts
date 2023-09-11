@@ -11,17 +11,17 @@ export interface Database {
     Tables: {
       hashtags_Block: {
         Row: {
-          content: string | null
+          content: string
           hBlockName: string
           id: number
         }
         Insert: {
-          content?: string | null
+          content: string
           hBlockName: string
           id?: number
         }
         Update: {
-          content?: string | null
+          content?: string
           hBlockName?: string
           id?: number
         }
@@ -29,14 +29,17 @@ export interface Database {
       }
       post: {
         Row: {
+          date: string | null
           id: number
           isPosted: boolean
         }
         Insert: {
+          date?: string | null
           id?: number
           isPosted?: boolean
         }
         Update: {
+          date?: string | null
           id?: number
           isPosted?: boolean
         }

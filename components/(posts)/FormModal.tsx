@@ -17,7 +17,7 @@ const FormModal: React.FC<ModalProtocol> = ({
     if (!file) return;
     const { data, error } = await supabase.storage
       .from("post-file")
-      .upload(`${file.name}-${Date.now()}`, file);
+      .upload(`${file.name}-CA=${Date.now()}?UA=${Date.now()}`, file);
     if (error) console.log(error);
     if (data) return data.path;
   };

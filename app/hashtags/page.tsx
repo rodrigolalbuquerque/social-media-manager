@@ -6,7 +6,7 @@ import supabase from "@/utils/supabaseClient";
 import { useState, useEffect } from "react";
 
 export interface BlockProtocol {
-  content: string | null;
+  content: string;
   hBlockName: string;
   id: number;
 }
@@ -86,6 +86,7 @@ const Page = () => {
         <FormModal
           updateBlockFunc={updateBlockFunc}
           toggleModal={toggleModal}
+          blockNames={blocks?.map((block) => block.hBlockName)}
         />
       )}
       {updaterModal && (

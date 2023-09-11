@@ -25,7 +25,7 @@ const OptionsModal: React.FC<OptionsModalProtocol> = ({
   // useEffect(() => {
   //   setBlock({
   //     hBlockName: currentBlockValues.hBlockName,
-  //     content: currentBlockValues.content || "",
+  //     content: currentBlockValues.content,
   //   });
   // }, []);
 

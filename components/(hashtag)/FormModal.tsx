@@ -1,32 +1,63 @@
 "use client";
 import { useState } from "react";
 
-interface ModalProp {
+interface HashtagsUpdaterProtocol {
   toggleModal: () => void;
-}
-
-interface UpdateBlockProp {
   updateBlockFunc: () => void;
+  blockNames: string[] | undefined;
 }
 
-interface CombinedProps extends ModalProp, UpdateBlockProp {}
+const blockObject = {
+  hBlockName: "",
+  content: "",
+};
 
-const FormModal: React.FC<CombinedProps> = ({
+const FormModal: React.FC<HashtagsUpdaterProtocol> = ({
   updateBlockFunc,
   toggleModal,
+  blockNames,
 }) => {
-  const [block, setData] = useState({
-    hBlockName: "",
-    content: "",
-  });
+  const [block, setBlock] = useState(blockObject);
+  const [blockNameErrorMessage, setblockNameErrorMessage] = useState<
+    string | null
+  >("");
+  const [contentErrorMessage, setcontentErrorMessage] = useState<string | null>(
+    "",
+  );
 
   const updateFormValue = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
-    setData((prevState) => ({ ...prevState, [e.target.id]: e.target.value }));
+    setblockNameErrorMessage(null);
+    setcontentErrorMessage(null);
+    setBlock((prevState) => ({ ...prevState, [e.target.id]: e.target.value }));
   };
 
   const postForm = async () => {
+    let error = false;
+
+    if (blockNames) {
+      if (blockNames.includes(`${block.hBlockName}`)) {
+        setblockNameErrorMessage(`O bloco ${block.hBlockName} já existe!`);
+        error = true;
+      }
+    }
+
+    if (block.hBlockName === "") {
+      setblockNameErrorMessage("Campo não estar vazio!");
+      error = true;
+    }
+
+    if (block.content === "") {
+      setcontentErrorMessage("Campo não estar vazio!");
+      error = true;
+    }
+
+    if (error) {
+      error = false;
+      return;
+    }
+
     await fetch("/api/hashtags", {
       method: "POST",
       body: JSON.stringify(block),
@@ -59,6 +90,11 @@ const FormModal: React.FC<CombinedProps> = ({
               id="hBlockName"
               className="name w-60 rounded-md border border-black bg-slate-50 p-2 text-lg drop-shadow-md"
             />
+            {blockNameErrorMessage && (
+              <span className="font-semibold text-red-700">
+                {blockNameErrorMessage}
+              </span>
+            )}
           </div>
           <div className="hBlock flex flex-col items-center justify-center">
             <span className="mb-2 text-xl">Hashtags</span>
@@ -70,6 +106,11 @@ const FormModal: React.FC<CombinedProps> = ({
               id="content"
               className="h-36 w-60 resize-none rounded-md border border-black bg-slate-50 p-2 text-lg drop-shadow-md"
             />
+            {contentErrorMessage && (
+              <span className="font-semibold text-red-700">
+                {contentErrorMessage}
+              </span>
+            )}
           </div>
           <button
             onClick={postForm}

@@ -1,4 +1,14 @@
 - fazer alteração nas funções de atualizar dados, modificando estados e re-renderizando
-no lugar de apenas modificar base de dados e fazer nova requisição
+no lugar de apenas modificar base de dados e fazer nova requisição (diminuir nmr de requests)
 
 - Deixar apenas uma instância do supabase (substituir nas paginas)
+
+- valiadar nome dos blocos de hashtags - Agora precisam ser únicos.
+
+- garantir que os objetos terão a propriedade chamada ou criar código p/ 
+lidar com a possibilidade de não ter.
+    Ex.:
+        "setpostText(currentPostValues.post_text[0].text)"
+
+- Fazer um fetch p/ minha API (que vai fazer uma request pro banco) é mais custoso que
+fazer a request direto? Vale a pena?

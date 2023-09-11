@@ -5,6 +5,7 @@ const nextConfig = {
   },
   images: {
     domains: ["images.pexels.com", "gipxfbdqcjrzcpmcfxoq.supabase.co"],
+    unoptimized: true,
   },
 };
 

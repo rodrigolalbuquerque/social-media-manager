@@ -22,7 +22,7 @@ const UpdaterFormModal: React.FC<UpdaterFormProtocol> = ({
   useEffect(() => {
     setBlock({
       hBlockName: currentBlockValues.hBlockName,
-      content: currentBlockValues.content || "",
+      content: currentBlockValues.content,
     });
   }, []);
 
@@ -64,7 +64,7 @@ const UpdaterFormModal: React.FC<UpdaterFormProtocol> = ({
               placeholder="Nome do Bloco"
               required
               type="text"
-              id="hBlockName"
+              id="hBlockName" //provavelmente necessário para o event.target
               className="name w-60 rounded-md border border-black bg-slate-50 p-2 text-lg drop-shadow-md"
             />
           </div>
