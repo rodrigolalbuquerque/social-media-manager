@@ -27,13 +27,12 @@ const UpdaterFormModal: React.FC<UpdaterProtocol> = ({
   currentPostValues,
 }) => {
   const [file, setFile] = useState<File>();
-  const [postText, setpostText] = useState("");
+  const [postText, setpostText] = useState<string | null>("");
   const [hashtagBlocks, setHashtagBlocks] = useState<BlocksProtocol[]>([
     blockObject,
   ]);
   const [blockName, setBlockName] = useState("");
-  const [shouldSendData, setShouldSendData] = useState(false);
-  const [errors, setErrors] = useState([""]);
+  const [errors, setErrors] = useState<string[]>([]);
 
   const currentBlockName =
     currentPostValues.post_text[0]?.hashtags_Block?.hBlockName;
@@ -61,11 +60,12 @@ const UpdaterFormModal: React.FC<UpdaterProtocol> = ({
   const updateFileFromStorage = async () => {
     const acceptedTypes = ["image/jpeg", "image/jpg", "image/png", "video/mp4"];
     if (file) {
-      if (acceptedTypes.includes(file?.type)) {
-        setErrors((prevErrors) => [
-          ...prevErrors,
-          "Arquivos permitidos: Jpeg, png e mp4",
-        ]);
+      if (acceptedTypes.includes(file.type)) {
+        // setErrors((prevErrors) => [
+        //   ...prevErrors,
+        //   "Arquivos permitidos: Jpeg, png e mp4",
+        // ]);
+        setErrors(["Tipo de arquivo não aceito!"]);
         return;
       }
       const fileName = currentPostValues.post_img[0].img?.match(/\/([^\/]+)\?/);
@@ -76,13 +76,14 @@ const UpdaterFormModal: React.FC<UpdaterProtocol> = ({
         ]);
         return;
       }
-      const { error } = await supabase.storage
-        .from("post-file")
-        .upload(fileName[1], file, { upsert: true });
-      if (error) {
-        setErrors((prevErrors) => [...prevErrors, error.message]);
-        return;
-      }
+      // const { error } = await supabase.storage
+      //   .from("post-file")
+      //   .upload(fileName[1], file, { upsert: true });
+      // if (error) {
+      //   setErrors((prevErrors) => [...prevErrors, error.message]);
+      //   return;
+      // }
+      console.log("Arquivo sobrescrito!");
     }
   };
 
@@ -98,19 +99,22 @@ const UpdaterFormModal: React.FC<UpdaterProtocol> = ({
       return;
     }
 
-    const { error } = await supabase
-      .from("post_img")
-      .update({ img: updatedUrl })
-      .eq(`id`, `${currentPostValues.post_img[0].id}`);
+    console.log("Imagem atualizada na DB!");
 
-    if (error) {
-      setErrors((prevErrors) => [...prevErrors, error.message]);
-      return;
-    }
+    // const { error } = await supabase
+    //   .from("post_img")
+    //   .update({ img: updatedUrl })
+    //   .eq(`id`, `${currentPostValues.post_img[0].id}`);
+
+    // if (error) {
+    //   setErrors((prevErrors) => [...prevErrors, error.message]);
+    //   return;
+    // }
   };
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    let shouldSendData = false;
     if (file) {
       await updateFileFromStorage();
       if (errors.length > 0) return;
@@ -118,21 +122,22 @@ const UpdaterFormModal: React.FC<UpdaterProtocol> = ({
       await updateFileUrlQueryString();
       if (errors.length > 0) return;
 
-      setShouldSendData(true);
+      shouldSendData = true;
     }
 
     if (postText && postText !== currentPostValues.post_text[0]?.text) {
-      const { error } = await supabase
-        .from("post_text")
-        .update({ text: postText })
-        .eq(`id`, `${currentPostValues.post_text[0].id}`);
+      // const { error } = await supabase
+      //   .from("post_text")
+      //   .update({ text: postText })
+      //   .eq(`id`, `${currentPostValues.post_text[0].id}`);
 
-      if (error) {
-        setErrors((prevErrors) => [...prevErrors, error.message]);
-        return;
-      }
+      // if (error) {
+      //   setErrors((prevErrors) => [...prevErrors, error.message]);
+      //   return;
+      // }
+      console.log("texto alterado na db!");
 
-      setShouldSendData(true);
+      shouldSendData = true;
     }
 
     if (blockName !== "Selecione" && blockName !== currentBlockName) {
@@ -140,21 +145,23 @@ const UpdaterFormModal: React.FC<UpdaterProtocol> = ({
         (block) => block.hBlockName === blockName,
       );
 
-      const { error } = await supabase
-        .from("post_text")
-        .update({ hBlockId: targetBlock[0].id })
-        .eq(`id`, `${currentPostValues.post_text[0].id}`);
-      if (error) {
-        console.log(error);
-        return;
-      }
-      setShouldSendData(true);
+      // const { error } = await supabase
+      //   .from("post_text")
+      //   .update({ hBlockId: targetBlock[0].id })
+      //   .eq(`id`, `${currentPostValues.post_text[0].id}`);
+      // if (error) {
+      //   console.log(error);
+      //   return;
+      // }
+      console.log("Hashtags alteradas na db!");
+
+      shouldSendData = true;
     }
 
     if (shouldSendData) {
       updatePostsFunc();
       toggleEditModal();
-      setShouldSendData(false);
+      shouldSendData = false;
     }
   };
 
@@ -185,6 +192,13 @@ const UpdaterFormModal: React.FC<UpdaterProtocol> = ({
           onSubmit={onSubmit}
           className="my-7 flex flex-col items-center justify-center gap-9"
         >
+          {errors.length > 0 && (
+            <ul>
+              {errors.map((error) => (
+                <li key={error}>{error}</li>
+              ))}
+            </ul>
+          )}
           <div className="flex flex-col items-center justify-center gap-2">
             <span className="mb-2 text-2xl font-bold">Nova Imagem / Vídeo</span>
             <input
@@ -194,11 +208,12 @@ const UpdaterFormModal: React.FC<UpdaterProtocol> = ({
               onChange={(e) => setFile(e.target.files?.[0])}
             />
           </div>
+          {/* {errors.length > 0 && <span>{errors[0]}</span>} */}
           <div className="flex flex-col items-center justify-center gap-2">
             <span className="mb-2 text-2xl font-bold">Texto do Post</span>
             <textarea
               onChange={updateFormValue}
-              value={postText}
+              value={postText ?? ""}
               placeholder="Post Text"
               id="content"
               className="h-40 w-96 resize-none rounded-md border border-black bg-slate-50 p-2 text-lg drop-shadow-md"
