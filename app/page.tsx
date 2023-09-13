@@ -18,7 +18,7 @@ export interface PostProtocol {
   id: number;
   post_text: {
     id: number;
-    text: string;
+    text: string | null;
     hashtags_Block: {
       hBlockName: string;
       content: string;

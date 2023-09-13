@@ -9,6 +9,8 @@
 /coverage
 teste.js
 toDO.txt
+.txt
+*.txt
 
 # next.js
 /.next/

@@ -75,19 +75,19 @@ export interface Database {
           hBlockId: number | null
           id: number
           postId: number | null
-          text: string
+          text: string | null
         }
         Insert: {
           hBlockId?: number | null
           id?: number
           postId?: number | null
-          text: string
+          text?: string | null
         }
         Update: {
           hBlockId?: number | null
           id?: number
           postId?: number | null
-          text?: string
+          text?: string | null
         }
         Relationships: [
           {

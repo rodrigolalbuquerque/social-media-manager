@@ -41,12 +41,17 @@ const FormModal: React.FC<ModalProtocol> = ({
     ]);
   };
 
+  const createPostText = async (postId: number) => {
+    await supabase.from("post_text").insert({ postId: postId, text: "" });
+  };
+
   const createPost = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const imgPath = await storeFile();
     if (!imgPath) return;
     const postId = await InsertOnPost();
     await InsertOnPostImg(postId, imgPath);
+    await createPostText(postId);
     toggleModal();
     updatePostsFunc();
   };

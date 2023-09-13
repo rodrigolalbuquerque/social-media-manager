@@ -39,7 +39,7 @@ const UpdaterFormModal: React.FC<UpdaterProtocol> = ({
     currentPostValues.post_text[0]?.hashtags_Block?.hBlockName;
 
   useEffect(() => {
-    setpostText(currentPostValues.post_text[0]?.text);
+    setpostText(currentPostValues.post_text[0]?.text ?? "");
     if (currentBlockName) {
       setBlockName(currentBlockName);
     } else {
@@ -111,15 +111,14 @@ const UpdaterFormModal: React.FC<UpdaterProtocol> = ({
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    await updateFileFromStorage();
-    if (errors.length > 0) return;
+    if (file) {
+      await updateFileFromStorage();
+      if (errors.length > 0) return;
 
-    await updateFileUrlQueryString();
-    if (errors.length > 0) return;
+      await updateFileUrlQueryString();
+      if (errors.length > 0) return;
 
-    setShouldSendData(true);
-
-    if (!postText || postText === currentPostValues.post_text[0]?.text) {
+      setShouldSendData(true);
     }
 
     if (postText && postText !== currentPostValues.post_text[0]?.text) {
@@ -132,6 +131,8 @@ const UpdaterFormModal: React.FC<UpdaterProtocol> = ({
         setErrors((prevErrors) => [...prevErrors, error.message]);
         return;
       }
+
+      setShouldSendData(true);
     }
 
     if (blockName !== "Selecione" && blockName !== currentBlockName) {
@@ -147,6 +148,7 @@ const UpdaterFormModal: React.FC<UpdaterProtocol> = ({
         console.log(error);
         return;
       }
+      setShouldSendData(true);
     }
 
     if (shouldSendData) {
