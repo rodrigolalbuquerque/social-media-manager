@@ -192,13 +192,6 @@ const UpdaterFormModal: React.FC<UpdaterProtocol> = ({
           onSubmit={onSubmit}
           className="my-7 flex flex-col items-center justify-center gap-9"
         >
-          {errors.length > 0 && (
-            <ul>
-              {errors.map((error) => (
-                <li key={error}>{error}</li>
-              ))}
-            </ul>
-          )}
           <div className="flex flex-col items-center justify-center gap-2">
             <span className="mb-2 text-2xl font-bold">Nova Imagem / Vídeo</span>
             <input
