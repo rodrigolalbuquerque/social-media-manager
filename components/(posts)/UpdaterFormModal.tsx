@@ -33,6 +33,7 @@ const UpdaterFormModal: React.FC<UpdaterProtocol> = ({
   ]);
   const [blockName, setBlockName] = useState("");
   const [errors, setErrors] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const currentBlockName =
     currentPostValues.post_text[0]?.hashtags_Block?.hBlockName;
@@ -48,6 +49,7 @@ const UpdaterFormModal: React.FC<UpdaterProtocol> = ({
       const res = await fetch("/api/hashtags");
       const blocks = await res.json();
       setHashtagBlocks(blocks);
+      setIsLoading(false);
     };
 
     getBlocks();
@@ -65,6 +67,7 @@ const UpdaterFormModal: React.FC<UpdaterProtocol> = ({
         //   ...prevErrors,
         //   "Arquivos permitidos: Jpeg, png e mp4",
         // ]);
+        console.log("Setando erros...");
         setErrors(["Tipo de arquivo não aceito!"]);
         return;
       }
@@ -117,7 +120,10 @@ const UpdaterFormModal: React.FC<UpdaterProtocol> = ({
     let shouldSendData = false;
     if (file) {
       await updateFileFromStorage();
-      if (errors.length > 0) return;
+      console.log("Função de atualização de arquivo rodou...");
+      if (errors.length > 0) {
+        console.log(errors);
+      }
 
       await updateFileUrlQueryString();
       if (errors.length > 0) return;
@@ -214,19 +220,23 @@ const UpdaterFormModal: React.FC<UpdaterProtocol> = ({
           </div>
           <div className="flex flex-col items-center justify-center gap-2">
             <span className="mb-2 text-2xl font-bold">Hashtags</span>
-            <select
-              value={blockName}
-              onChange={(e) => {
-                setBlockName(e.target.value);
-              }}
-            >
-              {hashtagBlocks.map((block) => (
-                <option value={block.hBlockName} key={block.id}>
-                  {block.hBlockName}
-                </option>
-              ))}
-              <option value="Selecione">Selecione</option>
-            </select>
+            {isLoading ? (
+              <div>Carregando...</div>
+            ) : (
+              <select
+                value={blockName}
+                onChange={(e) => {
+                  setBlockName(e.target.value);
+                }}
+              >
+                {hashtagBlocks.map((block) => (
+                  <option value={block.hBlockName} key={block.id}>
+                    {block.hBlockName}
+                  </option>
+                ))}
+                <option value="Selecione">Selecione</option>
+              </select>
+            )}
           </div>
           <button
             className="rounded-md border border-black bg-slate-50 px-5 py-2 drop-shadow-md"
